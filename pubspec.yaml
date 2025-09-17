@@ -1,0 +1,25 @@
+name: flutter_application_1
+description: A new Flutter project for Scam Detection Challenge.
+publish_to: 'none' # Remove this if you want to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1   # for custom fonts
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1   # fixes analysis_options.yaml include error
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/ecu-logo.png
