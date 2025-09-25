@@ -35,7 +35,6 @@ class HomeScreen extends StatelessWidget {
               children: [
                 // Header (tappable)
                 GestureDetector(
-                  onTap: () => _openSettings(context),
                   child: Container(
                     height: 110,
                     decoration: const BoxDecoration(
@@ -173,20 +172,6 @@ class HomeScreen extends StatelessWidget {
   // ---- Navigation helpers ----
   void _openQuiz(BuildContext context, String category) {
     Navigator.pushNamed(context, '/quiz', arguments: category);
-  }
-
-  void _openSettings(BuildContext context) {
-    Navigator.pushNamed(context, '/settings', arguments: {
-      'totalPoints': 0,
-      'bestStreak': 0,
-      'completedQuizzes': 0,
-      'accuracy': 0.0,
-      'keepLearning': <String>[
-        'Avoid links in emails',
-        'Verify caller identity',
-        'Use official apps or websites',
-      ],
-    });
   }
 }
 

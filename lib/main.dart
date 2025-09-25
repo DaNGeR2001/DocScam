@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'home_screen.dart';
 import 'quiz_screen.dart';
 import 'result_screen.dart';
-import 'settings_screen.dart';
 
 void main() => runApp(const DocScamApp());
 
@@ -41,20 +40,6 @@ class DocScamApp extends StatelessWidget {
               total: args['total'] as int,
               category: args['category'] as String,
               reviews: args['reviews'] as List<Map<String, dynamic>>,
-            ),
-          );
-        }
-        if (settings.name == '/settings') {
-          final args =
-              (settings.arguments as Map<String, dynamic>?) ?? const {};
-          return MaterialPageRoute(
-            builder: (_) => SettingsScreen(
-              totalPoints: (args['totalPoints'] as int?) ?? 0,
-              bestStreak: (args['bestStreak'] as int?) ?? 0,
-              completedQuizzes: (args['completedQuizzes'] as int?) ?? 0,
-              accuracy: (args['accuracy'] as double?) ?? 0.0,
-              keepLearning:
-                  (args['keepLearning'] as List<String>?) ?? const <String>[],
             ),
           );
         }

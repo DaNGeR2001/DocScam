@@ -144,29 +144,6 @@ class ResultScreen extends StatelessWidget {
                           child: const Text('Home'),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      // EXIT — clear stack and go to MAIN
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2F2F2F),
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size.fromHeight(44),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () {
-                            // Requires routes: { '/main': (_) => const MainScreen() } in main.dart
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/main',
-                              (route) => false,
-                            );
-                          },
-                          child: const Text('Exit'),
-                        ),
-                      ),
                     ],
                   ),
                 ),

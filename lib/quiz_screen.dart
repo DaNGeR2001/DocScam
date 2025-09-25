@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'question_bank.dart';
 
+/// A quiz screen that presents up to 10 random questions for the chosen
+/// category.  After the user selects an option, the selection is
+/// highlighted in blue and the next button becomes active, but the
+/// correctness of the choice is not revealed until the result screen.
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key, required this.category});
   final String category;
@@ -18,12 +22,13 @@ class _QuizScreenState extends State<QuizScreen> {
   int? _picked;
   bool _locked = false;
 
-  // For results: simple maps to avoid cross-file types
+  // For results: simple maps to avoid cross‑file types
   final List<Map<String, dynamic>> _reviews = [];
 
   @override
   void initState() {
     super.initState();
+    // Shuffle a copy of the question bank and take up to 10 questions.
     final bank = questionBank[widget.category] ?? const <Q>[];
     final toTake = min(10, bank.length);
     final list = [...bank]..shuffle(Random());
@@ -33,10 +38,10 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     final q = _selected[_index];
-
     return Scaffold(
       body: Stack(
         children: [
+          // Gradient background.
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -129,7 +134,7 @@ class _QuizScreenState extends State<QuizScreen> {
                           _OptionTile(
                             label: q.options[i],
                             indexLabel: String.fromCharCode(97 + i), // a,b,c,d
-                            state: _stateFor(i, q.correctIndex),
+                            state: _stateFor(i),
                             onTap: _locked ? null : () => _onPick(i, q),
                           ),
                           const SizedBox(height: 12),
@@ -185,7 +190,6 @@ class _QuizScreenState extends State<QuizScreen> {
       _locked = true;
       final isCorrect = picked == q.correctIndex;
       if (isCorrect) _score++;
-
       _reviews.add({
         'question': q.prompt,
         'options': q.options,
@@ -197,11 +201,12 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-  _TileState _stateFor(int i, int correctIndex) {
+  // Determine the display state for each option.  When locked, only
+  // highlight the selected option; do not reveal correctness until
+  // the results screen.
+  _TileState _stateFor(int i) {
     if (!_locked) return _TileState.idle;
-    if (i == correctIndex) return _TileState.correct; // green on correct
-    if (_picked == i) return _TileState.wrong; // red on wrong picked
-    return _TileState.disabled;
+    return i == _picked ? _TileState.selected : _TileState.disabled;
   }
 
   void _next() {
@@ -226,8 +231,15 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 }
 
-enum _TileState { idle, correct, wrong, disabled }
+/// Represents the state of an option tile.  `selected` indicates that the
+/// user picked this option; `disabled` is used for unselected options
+/// after answering; and `idle` is for all options before a choice is made.
+enum _TileState { idle, selected, disabled }
 
+/// A widget that displays a single answer option.  It adapts its
+/// colours based on the tile state: idle (white), selected (blue) and
+/// disabled (grey).  Icons are intentionally omitted so that the
+/// correctness is not revealed on the quiz screen.
 class _OptionTile extends StatelessWidget {
   const _OptionTile({
     required this.label,
@@ -245,35 +257,26 @@ class _OptionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color bg;
     final Color fg;
-    IconData? icon;
-
     switch (state) {
       case _TileState.idle:
         bg = Colors.white;
         fg = Colors.black87;
-        icon = null;
         break;
-      case _TileState.correct:
-        bg = const Color(0xFF1B5E20);
+      case _TileState.selected:
+        bg = const Color(0xFF303F9F); // blue highlight for selected
         fg = Colors.white;
-        icon = Icons.check_circle;
-        break;
-      case _TileState.wrong:
-        bg = const Color(0xFFB71C1C);
-        fg = Colors.white;
-        icon = Icons.cancel;
         break;
       case _TileState.disabled:
         bg = Colors.white;
         fg = Colors.black54;
-        icon = null;
         break;
     }
 
     return Material(
       color: bg,
       elevation: 6,
-      shadowColor: Colors.black.withValues(alpha: 0.18),
+      // ignore: deprecated_member_use
+      shadowColor: Colors.black.withOpacity(0.18),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -286,8 +289,8 @@ class _OptionTile extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: fg.withValues(
-                      alpha: state == _TileState.idle ? 0.08 : 0.20),
+                  // ignore: deprecated_member_use
+                  color: fg.withOpacity(state == _TileState.idle ? 0.08 : 0.20),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
@@ -302,7 +305,6 @@ class _OptionTile extends StatelessWidget {
                       color: fg, fontSize: 15, fontWeight: FontWeight.w600),
                 ),
               ),
-              if (icon != null) Icon(icon, color: Colors.white),
             ],
           ),
         ),
