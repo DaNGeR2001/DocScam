@@ -22,15 +22,14 @@ class DocScamApp extends StatelessWidget {
       theme: theme,
       home: const MainScreen(),
       routes: {
-        '/main': (_) => const MainScreen(), // 👈 add this
+        '/main': (_) => const MainScreen(),
         '/home': (_) => const HomeScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/quiz') {
           final category = settings.arguments as String;
           return MaterialPageRoute(
-            builder: (_) => QuizScreen(category: category),
-          );
+              builder: (_) => QuizScreen(category: category));
         }
         if (settings.name == '/result') {
           final args = settings.arguments as Map<String, dynamic>;
@@ -54,129 +53,295 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
       body: Stack(
         children: [
+          // Background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFF39003D),
+                  Color(0xFF2A0030),
                   Color(0xFF4B0059),
-                  Color(0xFF60007A)
+                  Color(0xFF6C00A3)
                 ],
               ),
             ),
           ),
-          const PositionedBlob(top: 24, left: -20, size: 120),
-          const PositionedBlob(top: 32, right: 18, size: 70, intensity: 0.8),
-          const PositionedBlob(bottom: 120, left: 26, size: 64, intensity: 0.7),
-          const PositionedBlob(bottom: 48, right: 32, size: 80),
+          const _Vignette(),
+
+          // Soft blobs (subtle, not interfering with alignment)
+          const PositionedBlob(top: 36, left: -40, size: 230, intensity: 0.95),
+          const PositionedBlob(top: 70, right: 24, size: 140, intensity: 0.85),
           const PositionedBlob(
-              bottom: 220, right: 18, size: 56, intensity: 0.85),
+              bottom: 132, left: 22, size: 130, intensity: 0.80),
+          const PositionedBlob(
+              bottom: 100, right: 22, size: 170, intensity: 0.90),
+
+          // Content with sticky footer, overflow-safe and centered
           SafeArea(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'DocScam',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        height: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Container(
-                      width: size.width * 0.55,
-                      height: size.width * 0.55,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            blurRadius: 24,
-                            offset: const Offset(0, 12),
-                          ),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding: const EdgeInsets.all(28.0),
-                        child: Image.asset('../assets/ecu-logo.png', fit: BoxFit.contain),
-                      ),
-                    ),
-                    const SizedBox(height: 36),
-                    Column(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          'Level Up Your Scam sense!\nLet\'s play.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            height: 1.4,
+                        // Center column with max width to align all items vertically
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 480),
+                              child: const _HeroContent(),
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        const Opacity(
-                          opacity: 0.55,
-                          child: SizedBox(
-                            height: 1,
-                            width: 220,
-                            child: DecoratedBox(
-                                decoration: BoxDecoration(color: Colors.white)),
+
+                        // Footer pinned at the bottom due to minHeight trick above
+                        const Padding(
+                          padding: EdgeInsets.only(top: 18, bottom: 10),
+                          child: Center(
+                            child: Opacity(
+                              opacity: 0.80,
+                              child: Text(
+                                '@powered  by ScamSlayers',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.25,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 28),
-                    SizedBox(
-                      width: 140,
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF3B2E),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 6,
-                          shadowColor: Colors.black.withValues(alpha: 0.25),
-                        ),
-                        onPressed: () => Navigator.pushNamed(context, '/home'),
-                        child: const Text('Play',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w700)),
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    const Opacity(
-                      opacity: 0.7,
-                      child: Text(
-                        '@powered  by ScamSlayers',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroContent extends StatelessWidget {
+  const _HeroContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final h = size.height;
+
+    // Responsive spacings to keep balance on different phones
+    final double topSpace = h * 0.06;
+    final double betweenTitleLogo = h * 0.02;
+    final double betweenLogoTagline = h * 0.05;
+    const double betweenTaglineButton = 16;
+
+    // Image scales with width but clamped for consistency
+    final double logoDiameter = size.width.clamp(280.0, 520.0) * 0.70;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment:
+          CrossAxisAlignment.center, // ⬅ ensure center alignment
+      children: [
+        SizedBox(height: topSpace),
+
+        // Title (centered)
+        Text(
+          'DocScam',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 44,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            height: 1.05,
+            letterSpacing: 0.2,
+          ),
+        ),
+
+        SizedBox(height: betweenTitleLogo),
+
+        // Logo perfectly centered with glow
+        Align(
+          alignment: Alignment.center,
+          child: _LogoWithGlow(diameter: logoDiameter),
+        ),
+
+        SizedBox(height: betweenLogoTagline),
+
+        // Tagline block (centered)
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Level Up Your Scam sense!\nLet\'s play.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Symmetric divider (centered)
+            const SizedBox(
+              width: 260,
+              height: 2,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.white54, Colors.white, Colors.white54],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: betweenTaglineButton),
+
+        // CTA button (gradient + glow), centered
+        Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: 200,
+            height: 56,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFF4A38).withValues(alpha: 0.46),
+                    blurRadius: 26,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFFF5A46), Color(0xFFFF3B2E)],
+                ),
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                onPressed: () => Navigator.pushNamed(context, '/home'),
+                child: const Text(
+                  'Play',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.3,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
           ),
-        ],
+        ),
+      ],
+    );
+  }
+}
+
+class _LogoWithGlow extends StatelessWidget {
+  const _LogoWithGlow({required this.diameter});
+  final double diameter;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Outer halo
+        Container(
+          width: diameter * 1.08,
+          height: diameter * 1.08,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF9B5CFF).withValues(alpha: 0.35),
+                blurRadius: 90,
+                spreadRadius: 10,
+              ),
+              BoxShadow(
+                color: const Color(0xFF6C00A3).withValues(alpha: 0.55),
+                blurRadius: 46,
+                spreadRadius: -8,
+              ),
+            ],
+            gradient: const RadialGradient(
+              colors: [Color(0xFF6E00D4), Color(0xFF4B007D)],
+              stops: [0.25, 1.0],
+            ),
+          ),
+        ),
+        // White disc (slight glass)
+        Container(
+          width: diameter,
+          height: diameter,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withValues(alpha: 0.95),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.22),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+        ),
+        // The logo image (centered)
+        Padding(
+          padding: EdgeInsets.all(diameter * 0.1),
+          child: Image.asset(
+            'assets/log.png', 
+            fit: BoxFit.contain,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Vignette extends StatelessWidget {
+  const _Vignette();
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [Colors.transparent, Colors.black.withValues(alpha: 0.28)],
+            stops: const [0.72, 1.0],
+            center: const Alignment(0, -0.10),
+            radius: 1.0,
+          ),
+        ),
       ),
     );
   }
