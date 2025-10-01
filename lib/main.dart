@@ -113,7 +113,7 @@ class MainScreen extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Padding(
                         padding: const EdgeInsets.all(0),
-                        child: Image.asset('../assets/log.png', fit: BoxFit.contain),
+                        child: Image.asset('../assets/logo.png', fit: BoxFit.contain),
                       ),
                     ),
                     const SizedBox(height: 36),
