@@ -183,12 +183,60 @@ final Map<String, List<Q>> questionBank = {
     ),
 
     // Yes/No text-only
-    const Q(
+     const Q(
       prompt:
-          'Courier calls from an unknown number asking for your card details. Is this OK?',
+          'Do you want to reschedule this package?',
       options: ['Yes', 'No'],
       correctIndex: 1,
-      explanation: 'Never give card details to inbound callers.',
+      explanation: 'Scammers send fake delivery texts asking you to pay small fees through strange links. Always check deliveries through the official courier website or app, not links in random messages.',
+      assetImage:
+          '../assets/Delivery/image123.png',
+    ),
+     const Q(
+      prompt:
+          'Is this a scam message?',
+      options: ['Yes', 'No'],
+      correctIndex: 0,
+      explanation: "This is a scam because the link is not the official USPS website and asks for personal details to confirm delivery. Real postal services don't ask for your information this way.",
+      assetImage:
+          '../assets/Delivery/image125.png',
+    ),
+     const Q(
+      prompt:
+          'This SMS claims you have a package waiting and provides a tracking code with a shortened link. Is this safe?',
+      options: ['Yes', 'No'],
+      correctIndex: 1,
+      explanation: 'Scammers use random tracking codes that look real but don’t match any official format. The shortened link hides the true destination, which is a classic phishing trick. Clicking could lead to a fake site designed to steal login or payment details.',
+      assetImage:
+          '../assets/Delivery/image137.png',
+    ),
+     const Q(
+      prompt:
+          "You get the above email mentioning that your shipment is scheduled for delivery. There is a “Sign in” button to sign in and reconfirm the delivery address. When you click that button, they are asking for your email address and password to sign in to your FedEx account. But when you enter your password, the web page says the password is incorrect."
+          "Which statement is true?",
+      options: ['Yes', 'No'],
+      correctIndex: 0,
+      explanation: 'This is a phishing scam. The web page is deliberately designed to trick you into giving away your email credentials under the disguise of a delivery confirmation.',
+      assetImage:
+          '../assets/Delivery/image126.png',
+    ),
+     const Q(
+      prompt:
+          'Courier calls from an unknown number asking for your card details. Is this OK?',
+      options: ['A scam', 'A legitimate'],
+      correctIndex: 0,
+      explanation: "This is a scam because the sender's email address is fake, and it asks you to click a link to reschedule delivery. Real USPS messages only come from their official site.",
+      assetImage:
+          '../assets/Delivery/image128.png',
+    ),
+     const Q(
+      prompt:
+          'This SMS says your package could not be delivered and gives a link to check status. Is this safe?',
+      options: ['Yes', 'No'],
+      correctIndex: 1,
+      explanation: 'Delivery companies never send generic links asking you to “check status.” The suspicious domain is unrelated to any real courier service. Clicking could install malware or trick you into entering personal details like your address, date of birth, or credit card number.',
+      assetImage:
+          '../assets/Delivery/image135.png',
     ),
   ],
   'Job Offers': [

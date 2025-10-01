@@ -55,7 +55,7 @@ class _QuizScreenState extends State<QuizScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header
+                // Header with question counter
                 Container(
                   padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
                   decoration: const BoxDecoration(
@@ -87,6 +87,16 @@ class _QuizScreenState extends State<QuizScreen> {
                           ),
                         ),
                       ),
+                      // question number indicator
+                      Text(
+                        'Q${_index + 1}/${_selected.length}',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
                       const CircleAvatar(
                         radius: 22,
                         backgroundColor: Colors.white24,
@@ -112,6 +122,26 @@ class _QuizScreenState extends State<QuizScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
+                        // If the question has an image, show it first
+                        if (q.assetImage != null) ...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.asset(
+                              q.assetImage!,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ] else if (q.imageUrl != null) ...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              q.imageUrl!,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                         Text(
                           q.prompt,
                           style: GoogleFonts.inter(
