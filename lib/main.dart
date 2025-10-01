@@ -118,7 +118,12 @@ class MainScreen extends StatelessWidget {
                       ),
                       alignment: Alignment.center,
                       child: Padding(
-                        padding: EdgeInsets.all(size.width * 0 ),
+                        padding: EdgeInsets.fromLTRB(
+                          size.width * 0.55 * 0.06, // left
+                          size.width * 0.55 * 0.10, // top
+                          size.width * 0.55 * 0.06, // right
+                          size.width * 0.55 * 0.06, // bottom
+                        ),
                         child: Image.asset(
                           'assets/logo.png',
                           fit: BoxFit.contain,
