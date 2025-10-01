@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'home_screen.dart';
@@ -102,9 +100,10 @@ class MainScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
+                    // Bigger circle and bigger logo
                     Container(
-                      width: size.width * 0.60,
-                      height: size.width * 0.60,
+                      width: size.width * 0.65,
+                      height: size.width * 0.65,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
@@ -118,7 +117,8 @@ class MainScreen extends StatelessWidget {
                       ),
                       alignment: Alignment.center,
                       child: Padding(
-                        padding: EdgeInsets.all(size.width * 0 ),
+                        // Use less padding to let the image fill more of the circle
+                        padding: EdgeInsets.all(size.width * 0.65 * 0.04),
                         child: Image.asset(
                           'assets/logo.png',
                           fit: BoxFit.contain,
