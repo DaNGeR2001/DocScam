@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'question_bank.dart';
 
-/// A quiz screen that presents up to 10 random questions for the chosen
-/// category.  After the user selects an option, the selection is
-/// highlighted in blue and the next button becomes active, but the
-/// correctness of the choice is not revealed until the result screen.
+/// QuizScreen presents up to 10 random questions for a given category.
+/// It lets the user select multiple answers but limits the selections
+/// to exactly the number of correct options (`correctIndices.length`).
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key, required this.category});
   final String category;
@@ -19,29 +18,28 @@ class _QuizScreenState extends State<QuizScreen> {
   late final List<Q> _selected;
   int _index = 0;
   int _score = 0;
-  int? _picked;
-  bool _locked = false;
+  Set<int> _pickedIndices = {};
 
-  // For results: simple maps to avoid cross‑file types
+  // For the results screen.
   final List<Map<String, dynamic>> _reviews = [];
 
   @override
   void initState() {
     super.initState();
-    // Shuffle a copy of the question bank and take up to 10 questions.
     final bank = questionBank[widget.category] ?? const <Q>[];
-    final toTake = min(10, bank.length);
     final list = [...bank]..shuffle(Random());
-    _selected = list.take(toTake).toList();
+    _selected = list.take(min(10, list.length)).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final q = _selected[_index];
+    final int maxSelections = q.correctIndices.length;
+
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient background.
+          // Gradient background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -55,117 +53,34 @@ class _QuizScreenState extends State<QuizScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header with question counter
-                Container(
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xFFB46BF2), Color(0xFF4B0F67)],
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(12),
-                      bottomRight: Radius.circular(12),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            'Quiz',
-                            style: GoogleFonts.playfairDisplay(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // question number indicator
-                      Text(
-                        'Q${_index + 1}/${_selected.length}',
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const CircleAvatar(
-                        radius: 22,
-                        backgroundColor: Colors.white24,
-                        child: Icon(Icons.emoji_people, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Content
+                _buildHeader(q),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _buildImageIfAny(q),
+                        _buildPrompt(q),
+                        const SizedBox(height: 12),
                         Text(
-                          'You get a phone call:',
-                          style: GoogleFonts.playfairDisplay(
+                          maxSelections == 1
+                              ? 'Select one answer:'
+                              : 'Select $maxSelections answers:',
+                          style: GoogleFonts.inter(
                             color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 10),
-                        // If the question has an image, show it first
-                        if (q.assetImage != null) ...[
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.asset(
-                              q.assetImage!,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                        ] else if (q.imageUrl != null) ...[
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              q.imageUrl!,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                        Text(
-                          q.prompt,
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'What do you do?',
-                          style: GoogleFonts.playfairDisplay(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
+                        // Build each option tile.
                         for (int i = 0; i < q.options.length; i++) ...[
                           _OptionTile(
                             label: q.options[i],
-                            indexLabel: String.fromCharCode(97 + i), // a,b,c,d
-                            state: _stateFor(i),
-                            onTap: _locked ? null : () => _onPick(i, q),
+                            indexLabel: String.fromCharCode(97 + i),
+                            state: _tileState(i, maxSelections),
+                            onTap: () => _handleTap(i, maxSelections),
                           ),
                           const SizedBox(height: 12),
                         ],
@@ -173,8 +88,6 @@ class _QuizScreenState extends State<QuizScreen> {
                     ),
                   ),
                 ),
-
-                // Next / Finish
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                   child: ElevatedButton(
@@ -183,29 +96,20 @@ class _QuizScreenState extends State<QuizScreen> {
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(46),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onPressed: _locked ? _next : null,
-                    child: Text(
-                        _index == _selected.length - 1 ? 'Finish' : 'Next'),
-                  ),
-                ),
-
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: Center(
-                    child: Opacity(
-                      opacity: 0.7,
-                      child: Text(
-                        '@powered  by ScamSlayers',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
+                    // Only enable the button when the user has selected the
+                    // required number of answers.
+                    onPressed: _pickedIndices.length == maxSelections
+                        ? _nextQuestion
+                        : null,
+                    child: Text(
+                      _index == _selected.length - 1 ? 'Finish' : 'Next',
+                    ),
                   ),
                 ),
+                _buildFooter(),
               ],
             ),
           ),
@@ -214,37 +118,140 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  void _onPick(int picked, Q q) {
+  // Build the top bar with back button and question counter.
+  Widget _buildHeader(Q q) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFB46BF2), Color(0xFF4B0F67)],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                'Quiz',
+                style: GoogleFonts.playfairDisplay(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          Text(
+            'Q${_index + 1}/${_selected.length}',
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: 8),
+          const CircleAvatar(
+            radius: 22,
+            backgroundColor: Colors.white24,
+            child: Icon(Icons.emoji_people, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Display image if any (asset or network).
+  Widget _buildImageIfAny(Q q) {
+    if (q.assetImage != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.asset(
+          q.assetImage!,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else if (q.imageUrl != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          q.imageUrl!,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
+  }
+
+  // Display the question prompt.
+  Widget _buildPrompt(Q q) {
+    return Text(
+      q.prompt,
+      style: GoogleFonts.playfairDisplay(
+        color: Colors.white,
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+
+  // Determine the state of each tile: selected, idle or disabled.
+  _TileState _tileState(int index, int maxSelections) {
+    final bool isSelected = _pickedIndices.contains(index);
+    final bool limitReached =
+        _pickedIndices.length >= maxSelections && !isSelected;
+    if (isSelected) {
+      return _TileState.selected;
+    } else if (limitReached) {
+      return _TileState.disabled;
+    } else {
+      return _TileState.idle;
+    }
+  }
+
+  // Handle tapping a tile.  Enforce the selection limit.
+  void _handleTap(int index, int maxSelections) {
     setState(() {
-      _picked = picked;
-      _locked = true;
-      final isCorrect = picked == q.correctIndex;
-      if (isCorrect) _score++;
-      _reviews.add({
-        'question': q.prompt,
-        'options': q.options,
-        'pickedIndex': picked,
-        'correctIndex': q.correctIndex,
-        'explanation': q.explanation,
-        'isCorrect': isCorrect,
-      });
+      if (_pickedIndices.contains(index)) {
+        _pickedIndices.remove(index);
+      } else if (_pickedIndices.length < maxSelections) {
+        _pickedIndices.add(index);
+      }
+      // else ignore the tap if the limit is reached.
     });
   }
 
-  // Determine the display state for each option.  When locked, only
-  // highlight the selected option; do not reveal correctness until
-  // the results screen.
-  _TileState _stateFor(int i) {
-    if (!_locked) return _TileState.idle;
-    return i == _picked ? _TileState.selected : _TileState.disabled;
-  }
+  // Proceed to the next question or go to results.
+  void _nextQuestion() {
+    final Q q = _selected[_index];
+    final Set<int> correctSet = Set<int>.from(q.correctIndices);
+    final bool isCorrect = _pickedIndices.length == correctSet.length &&
+        _pickedIndices.containsAll(correctSet);
+    if (isCorrect) _score++;
 
-  void _next() {
+    _reviews.add({
+      'question': q.prompt,
+      'options': q.options,
+      'pickedIndices': _pickedIndices.toList(),
+      'correctIndices': q.correctIndices,
+      'explanation': q.explanation,
+      'isCorrect': isCorrect,
+    });
+
     if (_index < _selected.length - 1) {
       setState(() {
         _index++;
-        _picked = null;
-        _locked = false;
+        _pickedIndices = {};
       });
     } else {
       Navigator.pushNamed(
@@ -259,58 +266,62 @@ class _QuizScreenState extends State<QuizScreen> {
       );
     }
   }
+
+  // Footer text
+  Widget _buildFooter() {
+    return const Padding(
+      padding: EdgeInsets.only(bottom: 8),
+      child: Center(
+        child: Opacity(
+          opacity: 0.7,
+          child: Text(
+            '@powered  by ScamSlayers',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-/// Represents the state of an option tile.  `selected` indicates that the
-/// user picked this option; `disabled` is used for unselected options
-/// after answering; and `idle` is for all options before a choice is made.
+/// States for the option tile.
 enum _TileState { idle, selected, disabled }
 
-/// A widget that displays a single answer option.  It adapts its
-/// colours based on the tile state: idle (white), selected (blue) and
-/// disabled (grey).  Icons are intentionally omitted so that the
-/// correctness is not revealed on the quiz screen.
+/// A widget representing a single answer option.
+/// It changes colours based on its state.
 class _OptionTile extends StatelessWidget {
   const _OptionTile({
     required this.label,
     required this.indexLabel,
     required this.state,
-    this.onTap,
+    required this.onTap,
   });
 
   final String label;
   final String indexLabel;
   final _TileState state;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final Color bg;
-    final Color fg;
-    switch (state) {
-      case _TileState.idle:
-        bg = Colors.white;
-        fg = Colors.black87;
-        break;
-      case _TileState.selected:
-        bg = const Color(0xFF303F9F); // blue highlight for selected
-        fg = Colors.white;
-        break;
-      case _TileState.disabled:
-        bg = Colors.white;
-        fg = Colors.black54;
-        break;
-    }
+    final bool selected = state == _TileState.selected;
+    final bool disabled = state == _TileState.disabled;
+    final Color bg = selected ? const Color(0xFF303F9F) : Colors.white;
+    final Color fg = selected ? Colors.white : Colors.black87;
+    final Color border = disabled ? Colors.black26 : fg.withOpacity(0.2);
 
     return Material(
       color: bg,
       elevation: 6,
-      // ignore: deprecated_member_use
       shadowColor: Colors.black.withOpacity(0.18),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
+        onTap: disabled ? null : onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
@@ -319,20 +330,28 @@ class _OptionTile extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  // ignore: deprecated_member_use
-                  color: fg.withOpacity(state == _TileState.idle ? 0.08 : 0.20),
+                  color: fg.withOpacity(selected ? 0.20 : 0.08),
+                  border: Border.all(color: border, width: 1.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
-                child: Text('$indexLabel)',
-                    style: TextStyle(color: fg, fontWeight: FontWeight.w700)),
+                child: Text(
+                  '$indexLabel)',
+                  style: TextStyle(
+                    color: fg,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   label,
                   style: GoogleFonts.inter(
-                      color: fg, fontSize: 15, fontWeight: FontWeight.w600),
+                    color: fg,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
