@@ -237,10 +237,21 @@ class _AnswerCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            // Only display the correct answer to avoid showing the user's choice.
-            Text(
-              'Correct Answer${correct.contains(',') ? 's' : ''}: $correct',
-              style: GoogleFonts.inter(color: Colors.white),
+            // Display correct answers on separate lines when there are multiple.
+            Builder(
+              builder: (context) {
+                // Split the comma-separated correct string into individual answers.
+                final List<String> parts = correct.split(', ');
+                final bool multiple = parts.length > 1;
+                // If multiple answers, prefix each with a bullet and join with newlines.
+                final String display = multiple
+                    ? parts.map((p) => '• $p').join('\n')
+                    : correct;
+                return Text(
+                  'Correct Answer${multiple ? 's' : ''}:\n$display',
+                  style: GoogleFonts.inter(color: Colors.white),
+                );
+              },
             ),
             if (explanation != null && explanation!.trim().isNotEmpty) ...[
               const SizedBox(height: 8),
