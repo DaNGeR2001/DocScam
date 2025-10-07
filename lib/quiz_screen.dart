@@ -64,10 +64,10 @@ class _QuizScreenState extends State<QuizScreen> {
                         _buildImageIfAny(q),
                         _buildPrompt(q),
                         const SizedBox(height: 12),
+                        // Always show a generic prompt instead of showing
+                        // the number of answers to select.
                         Text(
-                          maxSelections == 1
-                              ? 'Select one answer:'
-                              : 'Select $maxSelections answers:',
+                          'Please select correct answer',
                           style: GoogleFonts.inter(
                             color: Colors.white,
                             fontSize: 16,
@@ -203,27 +203,35 @@ class _QuizScreenState extends State<QuizScreen> {
 
   // Determine the state of each tile: selected, idle or disabled.
   _TileState _tileState(int index, int maxSelections) {
-    final bool isSelected = _pickedIndices.contains(index);
-    final bool limitReached =
-        _pickedIndices.length >= maxSelections && !isSelected;
-    if (isSelected) {
-      return _TileState.selected;
-    } else if (limitReached) {
-      return _TileState.disabled;
-    } else {
-      return _TileState.idle;
-    }
+    // If the index is in the picked set, mark it selected; otherwise idle.
+    // We no longer disable unselected options when the limit is reached so
+    // users can change their answers before moving to the next question.
+    return _pickedIndices.contains(index)
+        ? _TileState.selected
+        : _TileState.idle;
   }
 
   // Handle tapping a tile.  Enforce the selection limit.
   void _handleTap(int index, int maxSelections) {
     setState(() {
       if (_pickedIndices.contains(index)) {
+        // Deselect if already selected.
         _pickedIndices.remove(index);
-      } else if (_pickedIndices.length < maxSelections) {
-        _pickedIndices.add(index);
+      } else {
+        if (maxSelections == 1) {
+          // For single-answer questions, selecting a new option replaces the previous one.
+          _pickedIndices = {index};
+        } else {
+          // For multiple-answer questions, if the limit has been reached, remove
+          // one of the previously selected answers before adding the new one.
+          if (_pickedIndices.length >= maxSelections) {
+            // Remove an arbitrary previously selected answer (the first in the set).
+            final int toRemove = _pickedIndices.first;
+            _pickedIndices.remove(toRemove);
+          }
+          _pickedIndices.add(index);
+        }
       }
-      // else ignore the tap if the limit is reached.
     });
   }
 
