@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'question_bank.dart';
 
-/// QuizScreen presents up to 10 random questions for a given category.
+/// QuizScreen presents up to 5 random questions for a given category.
 /// It lets the user select multiple answers but limits the selections
 /// to exactly the number of correct options (`correctIndices.length`).
 class QuizScreen extends StatefulWidget {
@@ -28,7 +28,8 @@ class _QuizScreenState extends State<QuizScreen> {
     super.initState();
     final bank = questionBank[widget.category] ?? const <Q>[];
     final list = [...bank]..shuffle(Random());
-    _selected = list.take(min(10, list.length)).toList();
+    // Take at most 5 questions instead of 10.
+    _selected = list.take(min(5, list.length)).toList();
   }
 
   @override
@@ -159,12 +160,7 @@ class _QuizScreenState extends State<QuizScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(width: 8),
-          const CircleAvatar(
-            radius: 22,
-            backgroundColor: Colors.white24,
-            child: Icon(Icons.emoji_people, color: Colors.white),
-          ),
+          // Removed the trailing emoji person icon.
         ],
       ),
     );

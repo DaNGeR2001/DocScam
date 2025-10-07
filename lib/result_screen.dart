@@ -56,7 +56,7 @@ class ResultScreen extends StatelessWidget {
                           List<String>.from(r['options'] as List);
                       final List<int> pickedIndices =
                           List<int>.from(r['pickedIndices'] as List);
-                          final List<int> correctIndices =
+                      final List<int> correctIndices =
                           List<int>.from(r['correctIndices'] as List);
 
                       final String chosen = pickedIndices
@@ -208,9 +208,14 @@ class _AnswerCard extends StatelessWidget {
         isCorrect ? Icons.check_circle : Icons.cancel;
 
     return Material(
+      // Provide a translucent background.
       color: Colors.white.withOpacity(0.10),
       elevation: 0,
-      borderRadius: BorderRadius.circular(12),
+      // Use shape to add a border: green for correct, red for incorrect.
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: markColor, width: 2),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(14.0),
         child: Column(
@@ -218,7 +223,8 @@ class _AnswerCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(markIcon, color: markColor, size: 18),
+                // Bigger icon for the tick or cross.
+                Icon(markIcon, color: markColor, size: 24),
                 const SizedBox(width: 8),
                 Text(
                   'Question ${number.toString().padLeft(2, '0')}: '
@@ -231,11 +237,7 @@ class _AnswerCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            Text(
-              'Your Answer${chosen.contains(',') ? 's' : ''}: $chosen',
-              style: GoogleFonts.inter(color: Colors.white),
-            ),
-            const SizedBox(height: 6),
+            // Only display the correct answer to avoid showing the user's choice.
             Text(
               'Correct Answer${correct.contains(',') ? 's' : ''}: $correct',
               style: GoogleFonts.inter(color: Colors.white),
@@ -245,8 +247,7 @@ class _AnswerCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.menu_book,
-                      color: Colors.white, size: 18),
+                  const Icon(Icons.menu_book, color: Colors.white, size: 18),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
