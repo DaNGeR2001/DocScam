@@ -1,4 +1,6 @@
 // ignore_for_file: deprecated_member_use
+// App entry and shell for DocScam.
+// - Configures theme, routes, and a decorative landing screen (MainScreen)
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +10,7 @@ import 'result_screen.dart';
 
 void main() => runApp(const DocScamApp());
 
+/// The root widget of the application.
 class DocScamApp extends StatelessWidget {
   const DocScamApp({super.key});
 
@@ -19,6 +22,7 @@ class DocScamApp extends StatelessWidget {
       textTheme: GoogleFonts.playfairDisplayTextTheme(),
     );
 
+    /// The main application widget.
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme,
@@ -51,6 +55,7 @@ class DocScamApp extends StatelessWidget {
   }
 }
 
+/// The home screen displaying challenge categories.
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
 
@@ -58,6 +63,7 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
+    /// The main screen widget with decorative background and navigation to home.
     return Scaffold(
       body: Stack(
         children: [
@@ -203,6 +209,7 @@ class MainScreen extends StatelessWidget {
   }
 }
 
+/// A decorative blob positioned in the background.
 class PositionedBlob extends StatelessWidget {
   final double? top, left, right, bottom;
   final double size;
@@ -218,6 +225,7 @@ class PositionedBlob extends StatelessWidget {
     this.intensity = 1.0,
   });
 
+  /// Builds a positioned decorative blob with radial gradient.
   @override
   Widget build(BuildContext context) {
     return Positioned(

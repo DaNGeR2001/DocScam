@@ -145,7 +145,7 @@ class _QuizScreenState extends State<QuizScreen> {
           Expanded(
             child: Center(
               child: Text(
-                'Quiz',
+                'DocScam',
                 style: GoogleFonts.playfairDisplay(
                   color: Colors.white,
                   fontSize: 22,

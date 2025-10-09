@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// The app's landing screen.
+/// Shows a gradient background, a hero header, and three “challenge” tiles
+/// that navigate to the quiz screen with a selected category argument.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -52,19 +55,13 @@ class HomeScreen extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const CircleAvatar(
-                          radius: 24,
-                          backgroundColor: Colors.white24,
-                          child:
-                              Icon(Icons.person_outline, color: Colors.white),
-                        ),
                         const SizedBox(width: 14),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Hi Guest!',
+                              'Welcome!',
                               style: GoogleFonts.inter(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -72,7 +69,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Ready for your Challenge?',
+                              'Game on. Let’s go!',
                               style: GoogleFonts.inter(
                                 color: Colors.white.withValues(alpha: 0.85),
                                 fontSize: 13,
@@ -88,23 +85,16 @@ class HomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 18),
 
-                // Section title
+                // Section title (emoji removed)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: outerPadding),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.mood_outlined,
-                          color: Colors.white, size: 22),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Choose A Challenge.',
-                        style: GoogleFonts.playfairDisplay(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Pick a challenge to begin.',
+                    style: GoogleFonts.playfairDisplay(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
 
@@ -154,9 +144,10 @@ class HomeScreen extends StatelessWidget {
                       child: Text(
                         '@powered  by ScamSlayers',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600),
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
