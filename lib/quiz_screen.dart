@@ -16,6 +16,7 @@ class QuizScreen extends StatefulWidget {
   State<QuizScreen> createState() => _QuizScreenState();
 }
 
+/// State for QuizScreen, managing question selection, user answers,
 class _QuizScreenState extends State<QuizScreen> {
   late final List<Q> _selected;
   int _index = 0;
@@ -42,7 +43,7 @@ class _QuizScreenState extends State<QuizScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient background
+          /// Background gradient
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -66,8 +67,9 @@ class _QuizScreenState extends State<QuizScreen> {
                         _buildImageIfAny(q),
                         _buildPrompt(q),
                         const SizedBox(height: 12),
-                        // Always show a generic prompt instead of showing
-                        // the number of answers to select.
+
+                        /// Instruction text about selecting answers and limiting
+                        /// the number of selections.
                         Text(
                           'Please select correct answer',
                           style: GoogleFonts.inter(
@@ -77,7 +79,8 @@ class _QuizScreenState extends State<QuizScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        // Build each option tile.
+
+                        /// List of answer options
                         for (int i = 0; i < q.options.length; i++) ...[
                           _OptionTile(
                             label: q.options[i],
@@ -102,8 +105,9 @@ class _QuizScreenState extends State<QuizScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    // Only enable the button when the user has selected the
-                    // required number of answers.
+
+                    /// Only enable the button when the user has selected the
+                    /// required number of answers.
                     onPressed: _pickedIndices.length == maxSelections
                         ? _nextQuestion
                         : null,
@@ -121,7 +125,7 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  // Build the top bar with back button and question counter.
+  /// Header with back button, title, and question progress.
   Widget _buildHeader(Q q) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
@@ -162,13 +166,14 @@ class _QuizScreenState extends State<QuizScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          // Removed the trailing emoji person icon.
+
+          /// Invisible icon button to balance the layout
         ],
       ),
     );
   }
 
-  // Display image if any (asset or network).
+  /// Display image if any (asset or network).
   Widget _buildImageIfAny(Q q) {
     if (q.assetImage != null) {
       return ClipRRect(
@@ -191,7 +196,7 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
-  // Display the question prompt.
+  /// Question prompt text widget.
   Widget _buildPrompt(Q q) {
     return Text(
       q.prompt,
@@ -203,31 +208,31 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  // Determine the state of each tile: selected, idle or disabled.
+  /// Determine the state of each tile: selected, idle or disabled.
   _TileState _tileState(int index, int maxSelections) {
-    // If the index is in the picked set, mark it selected; otherwise idle.
-    // We no longer disable unselected options when the limit is reached so
-    // users can change their answers before moving to the next question.
+    /// If the index is in the picked set, mark it selected; otherwise idle.
+    /// We no longer disable unselected options when the limit is reached so
+    /// users can change their answers before moving to the next question.
     return _pickedIndices.contains(index)
         ? _TileState.selected
         : _TileState.idle;
   }
 
-  // Handle tapping a tile.  Enforce the selection limit.
+  /// Handle tapping a tile.  Enforce the selection limit.
   void _handleTap(int index, int maxSelections) {
     setState(() {
       if (_pickedIndices.contains(index)) {
-        // Deselect if already selected.
+        /// Deselect if already selected.
         _pickedIndices.remove(index);
       } else {
         if (maxSelections == 1) {
-          // For single-answer questions, selecting a new option replaces the previous one.
+          /// For single-answer questions, selecting a new option replaces the previous one.
           _pickedIndices = {index};
         } else {
-          // For multiple-answer questions, if the limit has been reached, remove
-          // one of the previously selected answers before adding the new one.
+          /// For multiple-answer questions, if the limit has been reached, remove
+          /// one of the previously selected answers before adding the new one.
           if (_pickedIndices.length >= maxSelections) {
-            // Remove an arbitrary previously selected answer (the first in the set).
+            /// Remove an arbitrary previously selected answer (the first in the set).
             final int toRemove = _pickedIndices.first;
             _pickedIndices.remove(toRemove);
           }
@@ -237,10 +242,11 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-  // Proceed to the next question or go to results.
+  /// Proceed to the next question or go to results.
   void _nextQuestion() {
     final Q q = _selected[_index];
-    final Set<int> correctSet = Set<int>.from(q.correctIndices);
+    final Set<int> correctSet =
+        Set<int>.from((q.correctIndices as Iterable).cast<int>());
     final bool isCorrect = _pickedIndices.length == correctSet.length &&
         _pickedIndices.containsAll(correctSet);
     if (isCorrect) _score++;
@@ -273,7 +279,7 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
-  // Footer text
+  /// Footer with attribution text.
   Widget _buildFooter() {
     return const Padding(
       padding: EdgeInsets.only(bottom: 8),

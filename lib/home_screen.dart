@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// The app's landing screen.
-/// Shows a gradient background, a hero header, and three “challenge” tiles
-/// that navigate to the quiz screen with a selected category argument.
+/// Home landing page that lists the three quiz categories
+/// with a decorative background and header.
+/// Tapping a category navigates to the quiz screen.
+/// Uses named routes for navigation.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  /// Outer padding for the screen content
+  /// Minimum height for each challenge tile
+  /// Border radius for each challenge tile
   static const double outerPadding = 14;
   static const double tileMinHeight = 88;
   static const double tileRadius = 18;
 
+  /// Builds the home screen with a gradient background,
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +32,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // Blobs
+          /// Decorative blobs
           const _Blob(top: 110, left: -18, size: 90),
           const _Blob(bottom: 100, right: 36, size: 72),
           const _Blob(bottom: 20, left: 90, size: 56),
@@ -36,7 +41,7 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header (tappable)
+                /// Header
                 GestureDetector(
                   child: Container(
                     height: 110,
@@ -55,7 +60,11 @@ class HomeScreen extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const SizedBox(width: 14),
+                        /// User avatar placeholder
+                        /// const CircleAvatar(...),
+                        /// const SizedBox(width: 14),
+
+                        /// Keep the greeting text aligned to the left
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +78,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Game on. Let’s go!',
+                              'Game time, Outsmart the scamsters.',
                               style: GoogleFonts.inter(
                                 color: Colors.white.withValues(alpha: 0.85),
                                 fontSize: 13,
@@ -85,11 +94,11 @@ class HomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 18),
 
-                // Section title (emoji removed)
+                /// Title
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: outerPadding),
                   child: Text(
-                    'Pick a challenge to begin.',
+                    'Select Your Battlezone',
                     style: GoogleFonts.playfairDisplay(
                       color: Colors.white,
                       fontSize: 22,
@@ -100,7 +109,7 @@ class HomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 18),
 
-                // Tiles
+                /// Challenge Tiles
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: outerPadding),
                   child: Column(
@@ -135,7 +144,7 @@ class HomeScreen extends StatelessWidget {
 
                 const Spacer(),
 
-                // Footer
+                /// Footer
                 const Padding(
                   padding: EdgeInsets.only(bottom: 10),
                   child: Center(
@@ -160,12 +169,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // ---- Navigation helpers ----
   void _openQuiz(BuildContext context, String category) {
     Navigator.pushNamed(context, '/quiz', arguments: category);
   }
 }
 
+/// A tile representing a quiz challenge category.
 class _ChallengeTile extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -181,6 +190,7 @@ class _ChallengeTile extends StatelessWidget {
     this.radius = 18,
   });
 
+  /// Builds a tappable tile with icon, label, and chevron.
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
@@ -219,6 +229,7 @@ class _ChallengeTile extends StatelessWidget {
   }
 }
 
+/// A decorative blob positioned in the background.
 class _Blob extends StatelessWidget {
   final double? top, left, right, bottom;
   final double size;
@@ -226,6 +237,7 @@ class _Blob extends StatelessWidget {
   const _Blob(
       {this.top, this.left, this.right, this.bottom, required this.size});
 
+  /// Builds a positioned decorative blob with radial gradient.
   @override
   Widget build(BuildContext context) {
     return Positioned(

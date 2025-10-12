@@ -30,7 +30,7 @@ class ResultScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient.
+          /// Background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -59,16 +59,13 @@ class ResultScreen extends StatelessWidget {
                       final List<int> correctIndices =
                           List<int>.from(r['correctIndices'] as List);
 
-                      final String chosen = pickedIndices
-                          .map((j) => options[j])
-                          .join(', ');
-                      final String correct = correctIndices
-                          .map((j) => options[j])
-                          .join(', ');
+                      final String chosen =
+                          pickedIndices.map((j) => options[j]).join(', ');
+                      final String correct =
+                          correctIndices.map((j) => options[j]).join(', ');
 
                       final bool isCorrect = r['isCorrect'] as bool;
-                      final String? explanation =
-                          r['explanation'] as String?;
+                      final String? explanation = r['explanation'] as String?;
 
                       return _AnswerCard(
                         number: i + 1,
@@ -125,6 +122,7 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
+  /// Builds the header with back button, title, and score circle.
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 18),
@@ -204,14 +202,14 @@ class _AnswerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color markColor =
         isCorrect ? const Color(0xFF1B5E20) : const Color(0xFFB71C1C);
-    final IconData markIcon =
-        isCorrect ? Icons.check_circle : Icons.cancel;
+    final IconData markIcon = isCorrect ? Icons.check_circle : Icons.cancel;
 
     return Material(
-      // Provide a translucent background.
+      /// Provide a translucent background.
       color: Colors.white.withOpacity(0.10),
       elevation: 0,
-      // Use shape to add a border: green for correct, red for incorrect.
+
+      /// Use shape to add a border: green for correct, red for incorrect.
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: markColor, width: 2),
@@ -223,7 +221,7 @@ class _AnswerCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                // Bigger icon for the tick or cross.
+                /// Bigger icon for the tick or cross.
                 Icon(markIcon, color: markColor, size: 24),
                 const SizedBox(width: 8),
                 Text(
@@ -237,18 +235,19 @@ class _AnswerCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            // Display correct answers on separate lines when there are multiple.
+
+            /// Display correct answers on separate lines when there are multiple.
             Builder(
               builder: (context) {
-                // Split the comma-separated correct string into individual answers.
+                /// Split the comma-separated correct string into individual answers.
                 final List<String> parts = correct.split(', ');
                 final bool multiple = parts.length > 1;
-                // If multiple answers, prefix each with a bullet and join with newlines.
-                final String display = multiple
-                    ? parts.map((p) => '• $p').join('\n')
-                    : correct;
+
+                /// If multiple answers, prefix each with a bullet and join with newlines.
+                final String display =
+                    multiple ? parts.map((p) => ' $p').join('\n') : correct;
                 return Text(
-                  'Correct Answer${multiple ? 's' : ''}:\n$display',
+                  'Answer${multiple ? 's' : ''}:\n$display',
                   style: GoogleFonts.inter(color: Colors.white),
                 );
               },
